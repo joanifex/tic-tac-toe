@@ -1,5 +1,5 @@
 $(document).ready(function(){
-
+  // TODO: refactor into board object and player objects
   var winningCombinations = [
     [1,2,3], [4,5,6], [7,8,9], // horizontals
     [1,4,7], [2,5,8], [3,6,9], // verticals
@@ -10,8 +10,20 @@ $(document).ready(function(){
 
   var $display = $('.display');
 
+  function computerRound(){
+    computerTurn();
+    // TODO: refactor has_won to be with player object
+    if (has_won(computerChoices)){
+      computerWin();
+    }
+    if ( is_tie() ){
+      tie();
+      reset();
+    }
+  }
+
   function computerTurn(){
-    //refactor selection function
+    // TODO: refactor selection function
     if ( $('.box-5').hasClass('box-open') ){
       $('.box-5').html('<p class="text">o</p>');
       $('.box-5').removeClass('box-open');
@@ -23,18 +35,15 @@ $(document).ready(function(){
       $button.html('<p class="text">o</p>');
       $button.removeClass('box-open');
       $button.addClass('box-closed');
+      computerChoices.push($button.data('boxNumber'));
     }
-    if ( has_won(computerChoices) ){
-      computerWin();
-    }
-    checkTie();
   };
 
   function has_won(choices){
     if ( choices.length >= 3 ) {
       return winningCombinations.some(function(combination){
         return combination.every(function(number){
-          return playerChoices.indexOf(number) > - 1;
+          return choices.indexOf(number) > - 1;
         });
       });
     } else {
@@ -42,21 +51,34 @@ $(document).ready(function(){
     }
   };
 
-  function checkTie(){
+  function is_tie(){
     if ( $('.box-open').length === 0 ){
-      tie();
+      return true
+    } else {
+      return false
     }
   };
 
+  // TODO: refactor into board functions
+
   function computerWin(){
     $display.html('Computer Wins');
+    reset();
   };
   function playerWin(){
     $display.html('Player Wins');
+    reset();
   };
   function tie(){
     $display.html('Tie');
+    reset();
   };
+
+  function reset(){
+    playerChoices = [];
+    computerChoices = [];
+    $('.btn').html('')
+  }
 
   $('.btn').each(function( index ){
     $(this).data('boxNumber', index + 1);
@@ -71,8 +93,13 @@ $(document).ready(function(){
       if ( has_won(playerChoices)){
         playerWin();
       }
+      else if ( is_tie() ){
+        tie();
+        reset();
+      }
+      else {
+        computerRound();
+      }
     }
-    checkTie();
-    computerTurn();
   });
 });

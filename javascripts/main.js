@@ -8,6 +8,8 @@ $(document).ready(function(){
   var playerChoices = [],
       computerChoices = [];
 
+  var $display = $('.display');
+
   function computerTurn(){
     //refactor selection function
     if ( $('.box-5').hasClass('box-open') ){
@@ -22,9 +24,13 @@ $(document).ready(function(){
       $button.removeClass('box-open');
       $button.addClass('box-closed');
     }
+    if ( has_won(computerChoices) ){
+      computerWin();
+    }
+    checkTie();
   };
 
-  function win(choices){
+  function has_won(choices){
     if ( choices.length >= 3 ) {
       return winningCombinations.some(function(combination){
         return combination.every(function(number){
@@ -37,7 +43,19 @@ $(document).ready(function(){
   };
 
   function checkTie(){
+    if ( $('.box-open').length === 0 ){
+      tie();
+    }
+  };
 
+  function computerWin(){
+    $display.html('Computer Wins');
+  };
+  function playerWin(){
+    $display.html('Player Wins');
+  };
+  function tie(){
+    $display.html('Tie');
   };
 
   $('.btn').each(function( index ){
@@ -50,10 +68,11 @@ $(document).ready(function(){
       $(this).removeClass('box-open');
       $(this).addClass('box-closed');
       playerChoices.push($(this).data('boxNumber'));
-      if ( win(playerChoices)){
-        alert('win');
+      if ( has_won(playerChoices)){
+        playerWin();
       }
     }
+    checkTie();
     computerTurn();
   });
 });
